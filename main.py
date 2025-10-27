@@ -1,6 +1,7 @@
 import flet as ft
-from alert import AlertManager
+from flet.core.list_view import ListView
 from automobile import Automobile
+from alert import AlertManager
 from autonoleggio import Autonoleggio
 
 FILE_AUTO = "automobili.csv"
@@ -38,16 +39,11 @@ def main(page: ft.Page):
 
     # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno, contatore posti)
 
-    txt_nuova_automobile = ft.Text(value='Aggiungi nuova automibile', size= 20)
+    txt_nuova_automobile = ft.Text(value='Aggiungi nuova automobile', size= 20)
     input_marca=ft.TextField(value='Marca')
     input_modello=ft.TextField(value='Modello')
     input_anno=ft.TextField(value='Anno')
-    btnMinus = ft.IconButton(icon=ft.Icons.REMOVE,
-                             icon_color="green",
-                             icon_size=24, on_click=handleRemove)
-    btnAdd = ft.IconButton(icon=ft.Icons.ADD,
-                           icon_color="green",
-                           icon_size=24, on_click=handleAdd)
+
     input_posti = ft.TextField(width=100, disabled=True,
                           value=0, border_color="green",
                           text_align=ft.TextAlign.CENTER)
@@ -71,30 +67,45 @@ def main(page: ft.Page):
         page.update()
 
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
-    def handleAdd()
-        currentVal = input_posti.value
+    def handleAdd(e):
+        currentVal = int(input_posti.value)
         input_posti.value = currentVal + 1
         input_posti.update()
 
-    def handleRemove():
-        currentVal = input_posti.value
+    def handleRemove(e):
+        currentVal = int(input_posti.value)
         input_posti.value = currentVal - 1
         input_posti.update()
 
-    def nuova_automobile(e):
-        nuova_auto = Autonoleggio.aggiungi_automobile(input_marca, input_modello, input_anno, input_posti)
-        lista_auto.append(nuova_auto)
+    def nuova_automobile(marca, modello, anno, posti):
+        if posti is int:
+            Autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
+
+        else:
+            alert.show_alert('Valori non numerici')
+
+        input_marca.value = marca
+        input_modello.value= modello
+        input_anno.value= anno
+        input_posti.value = 0
+
         page.update()
 
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
-
+    pulsante_conferma_nuova_automobile = ft.ElevatedButton("Aggiungi automobile", on_click=nuova_automobile(input_marca.value, input_modello.value, input_anno.value, input_posti.value))
     # Bottoni per la gestione dell'inserimento di una nuova auto
-    # TODO
+    btnMinus = ft.IconButton(icon=ft.Icons.REMOVE,
+                             icon_color="green",
+                             icon_size=24, on_click=handleRemove)
+    btnAdd = ft.IconButton(icon=ft.Icons.ADD,
+                           icon_color="green",
+                           icon_size=24, on_click=handleAdd)
 
     # --- LAYOUT ---
+    contatore= ft.Row(spacing=10, controls=[btnMinus, input_posti, btnAdd], alignment=ft.MainAxisAlignment.CENTER)
     page.add(
         toggle_cambia_tema,
 
@@ -110,7 +121,9 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        txt_nuova_automobile,
+        ft.Row(spacing=50,controls=[input_marca, input_modello, input_anno, contatore], alignment=ft.MainAxisAlignment.CENTER),
+        pulsante_conferma_nuova_automobile,
 
         # Sezione 4
         ft.Divider(),

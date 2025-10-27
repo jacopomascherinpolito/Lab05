@@ -40,7 +40,7 @@ class Autonoleggio:
         except FileNotFoundError:
             raise Exception(f"File {file_path} non trovato.")
 
-    def aggiungi_automobile(self, marca, modello, anno, num_posti):
+    def aggiungi_automobile(self, marca: str, modello: str, anno: int, num_posti: int) -> Automobile:
         """Aggiunge un'automobile nell'autonoleggio: aggiunge solo nel sistema e non aggiorna il file"""
         # Calcolo codice progressivo
         if self.automobili:
