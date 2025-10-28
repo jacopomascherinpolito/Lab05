@@ -45,7 +45,7 @@ def main(page: ft.Page):
     input_anno=ft.TextField(value='Anno')
 
     input_posti = ft.TextField(width=100, disabled=True,
-                          value=0, border_color="green",
+                          value=int('0'), border_color="green",
                           text_align=ft.TextAlign.CENTER)
     # --- FUNZIONI APP ---
     def aggiorna_lista_auto():
@@ -66,6 +66,25 @@ def main(page: ft.Page):
         txt_responsabile.value = f"Responsabile: {autonoleggio.responsabile}"
         page.update()
 
+    def nuova_automobile(e):
+        marca = input_marca.value
+        modello = input_modello.value
+        try:
+            anno = int(input_anno.value)
+            posti = int(input_posti.value)
+            if posti < 0 or anno < 0:
+                alert.show_alert('❌ Errore: Inserire valori numerici vaalidi per anno e posti')
+            else:
+                Autonoleggio.aggiungi_automobile(autonoleggio, marca, modello, anno, posti)
+        except Exception:
+            alert.show_alert('❌ Errore: Inserire valori numerici validi per anno e posti')
+        input_marca.value = 'Marca'
+        input_modello.value= 'Modello'
+        input_anno.value= 'Anno'
+        input_posti.value = 0
+        aggiorna_lista_auto()
+        page.update()
+
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
     def handleAdd(e):
         currentVal = int(input_posti.value)
@@ -77,25 +96,13 @@ def main(page: ft.Page):
         input_posti.value = currentVal - 1
         input_posti.update()
 
-    def nuova_automobile(marca, modello, anno, posti):
-        if posti is int:
-            Autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
 
-        else:
-            alert.show_alert('Valori non numerici')
-
-        input_marca.value = marca
-        input_modello.value= modello
-        input_anno.value= anno
-        input_posti.value = 0
-
-        page.update()
 
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
-    pulsante_conferma_nuova_automobile = ft.ElevatedButton("Aggiungi automobile", on_click=nuova_automobile(input_marca.value, input_modello.value, input_anno.value, input_posti.value))
+    pulsante_conferma_nuova_automobile = ft.ElevatedButton("Aggiungi automobile", on_click=nuova_automobile)
     # Bottoni per la gestione dell'inserimento di una nuova auto
     btnMinus = ft.IconButton(icon=ft.Icons.REMOVE,
                              icon_color="green",
